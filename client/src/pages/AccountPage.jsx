@@ -1,5 +1,6 @@
-import { useContext, useState } from "react"
-import { UserContext } from "../UserContext"
+import { useContext, useState } from "react";
+import { UserContext } from "../UserContext";
+import PlacesPage from "./PlacesPage";
 import { Navigate, Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -64,6 +65,7 @@ export default function AccountPage() {
                     My accommodations
                 </Link>
             </nav>
+
             {subpage === 'profile' && (
                 <div className="text-center max-w-lg mx-auto">
                     Logged in as {user.name} ({user.email})<br />
@@ -71,6 +73,9 @@ export default function AccountPage() {
                 </div>
             )}
 
+            {subpage === 'places' && (
+                <PlacesPage />
+            )}
         </div>
     )
 }
