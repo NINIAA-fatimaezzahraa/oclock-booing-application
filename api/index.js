@@ -4,6 +4,7 @@ const { default: mongoose } = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const imageDownloader = require('image-downloader');
 
 const User = require('./models/User.js');
 
@@ -16,6 +17,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static(__dirname+'/uploads'));
 
 app.use(cors({
     credentials: true,
@@ -83,6 +85,19 @@ app.get('/api/profile', (req, res) => {
 app.post('/api/logout', (req, res) => {
     res.cookie('token', '').json(true);
 });
+
+app.post('/api/upload-by-link', async (req, res) => {
+    const { link } = req.body;
+    const newName = 'photo' + Date.now() + '.jpg';
+    
+    await imageDownloader.image({
+        url: link,
+        dest:  __dirname + '/uploads/' + newName,
+    });
+    
+    res.json(newName);
+});
+
 
 app.listen(4000, () => {
     console.log('Server is running on port 4000');
