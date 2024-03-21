@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 const User = require('./models/User.js');
+const Place = require('./models/Place.js');
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = 'fasefraw4r5r3wq45wdfgw34twdfg';
@@ -20,7 +21,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use('/uploads', express.static(__dirname+'/uploads'));
+app.use('/uploads', express.static(__dirname + '/uploads'));
 
 app.use(cors({
     credentials: true,
@@ -92,22 +93,22 @@ app.post('/api/logout', (req, res) => {
 app.post('/api/upload-by-link', async (req, res) => {
     const { link } = req.body;
     const newName = 'photo' + Date.now() + '.jpg';
-    
+
     await imageDownloader.image({
         url: link,
-        dest:  __dirname + '/uploads/' + newName,
+        dest: __dirname + '/uploads/' + newName,
     });
-    
+
     res.json(newName);
 });
 
 
-const photosMiddleware = multer({dest:'uploads/'});
+const photosMiddleware = multer({ dest: 'uploads/' });
 
 app.post('/api/upload', photosMiddleware.array('photos', 100), (req, res) => {
     const uploadedFiles = [];
-    for(const element of req.files) {
-        const {path, originalname} = element;
+    for (const element of req.files) {
+        const { path, originalname } = element;
         const parts = originalname.split('.');
         const ext = parts[parts.length - 1];
         const newPath = path + '.' + ext;
@@ -117,6 +118,40 @@ app.post('/api/upload', photosMiddleware.array('photos', 100), (req, res) => {
     }
 
     res.json(uploadedFiles);
+});
+
+app.post('/api/places', (req, res) => {
+    const { token } = req.cookies;
+
+    const {
+        title,
+        address,
+        addedPhotos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkOut,
+        maxGuests,
+    } = req.body;
+
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        if (err) throw err;
+        const placeDoc = await Place.create({
+            owner: userData.id, 
+            title,
+            address,
+            photos: addedPhotos,
+            description,
+            perks,
+            extraInfo,
+            checkIn,
+            checkOut,
+            maxGuests,
+        });
+        
+        res.json(placeDoc);
+    });
 });
 
 app.listen(4000, () => {
