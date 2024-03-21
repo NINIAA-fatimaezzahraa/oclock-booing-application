@@ -138,7 +138,7 @@ app.post('/api/places', (req, res) => {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
         const placeDoc = await Place.create({
-            owner: userData.id, 
+            owner: userData.id,
             title,
             address,
             photos: addedPhotos,
@@ -149,8 +149,18 @@ app.post('/api/places', (req, res) => {
             checkOut,
             maxGuests,
         });
-        
+
         res.json(placeDoc);
+    });
+});
+
+app.get('/api/places', async (req, res) => {
+    const { token } = req.cookies;
+
+    jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+        const { id } = userData;
+
+        res.json(await Place.find({ owner: id }));
     });
 });
 
