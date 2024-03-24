@@ -28,7 +28,7 @@ app.use(cors({
     origin: 'http://127.0.0.1:5173',
 }));
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.MONGO_URL);
 
 app.get('/api/test', (req, res) => {
     res.json('test ok');
