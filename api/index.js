@@ -11,6 +11,7 @@ const path = require('path');
 
 const User = require('./models/User.js');
 const Place = require('./models/Place.js');
+const Booking = require('./models/Booking.js');
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = 'fasefraw4r5r3wq45wdfgw34twdfg';
@@ -204,6 +205,34 @@ app.put('/api/places', async (req, res) => {
 
 app.get('/api/places', async (req, res) => {
     res.json(await Place.find());
+});
+
+app.post('/api/bookings', async (req, res) => {
+    const userData = await getUserDataFromReq(req);
+    const {
+        place,
+        checkIn,
+        checkOut,
+        numberOfGuests,
+        name,
+        phone,
+        price
+    } = req.body;
+
+    Booking.create({
+        place,
+        checkIn,
+        checkOut,
+        numberOfGuests,
+        name,
+        phone,
+        price,
+        user: userData.id
+    }).then((doc) => {
+        res.json(doc);
+    }).catch((err) => {
+        throw err;
+    });
 });
 
 
