@@ -66,7 +66,7 @@ app.post('/api/login', async (req, res) => {
                 res.cookie('token', token).json(userDoc);
             });
         } else {
-            res.status(422).json('password not ok');
+            res.status(422).json('Wrong password');
         }
     } else {
         res.json('user not found');
@@ -207,6 +207,15 @@ app.get('/api/places', async (req, res) => {
     res.json(await Place.find());
 });
 
+function getUserDataFromReq(req) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+            if (err) throw err;
+            resolve(userData);
+        });
+    });
+}
+
 app.post('/api/bookings', async (req, res) => {
     const userData = await getUserDataFromReq(req);
     const {
@@ -233,6 +242,11 @@ app.post('/api/bookings', async (req, res) => {
     }).catch((err) => {
         throw err;
     });
+});
+
+app.get('/api/bookings', async (req, res) => {
+    const userData = await getUserDataFromReq(req);
+    res.json(await Booking.find({ user: userData.id }).populate('place'));
 });
 
 
