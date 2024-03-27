@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Image from "../Image";
+import Image from "../components/Image";
 
 
 export default function IndexPage() {
