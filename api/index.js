@@ -24,10 +24,19 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-app.use(cors({
-    credentials: true,
-    origin: 'http://127.0.0.1:5173',
-}));
+const allowedOrigins = ['http://127.0.0.1:5173', 'http://127.0.0.1'];
+
+const corsOptionsDelegate = function (req, callback) {
+    let corsOptions;
+    if (allowedOrigins.indexOf(req.header('Origin')) !== -1) {
+        corsOptions = { origin: true };
+    } else {
+        corsOptions = { origin: false };
+    }
+    callback(null, corsOptions);
+};
+
+app.use(cors(corsOptionsDelegate));
 
 mongoose.connect(process.env.MONGO_URL);
 
